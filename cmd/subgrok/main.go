@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/n7st/subgrok/internal/app/subgrok"
+	"github.com/n7st/subgrok/internal/app/subpoll"
 	"github.com/n7st/subgrok/internal/pkg/config"
 )
 
@@ -19,5 +20,8 @@ func main() {
 	}
 
 	bot := subgrok.Load(applicationConfig)
+	poller := subpoll.Load(applicationConfig, bot)
+
+	poller.Poll()
 	bot.Connect()
 }

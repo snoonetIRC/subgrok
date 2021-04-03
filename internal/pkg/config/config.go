@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/vartanbeno/go-reddit/v2/reddit"
 	"gopkg.in/yaml.v2"
 )
 
@@ -72,4 +73,13 @@ func Load() (*Config, error) {
 
 func (ic *ircConfig) Hostname() string {
 	return fmt.Sprintf("%s:%d", ic.Server, ic.Port)
+}
+
+func (rc *redditConfig) Credentials() *reddit.Credentials {
+	return &reddit.Credentials{
+		ID:       rc.ID,
+		Secret:   rc.Secret,
+		Username: rc.Username,
+		Password: rc.Password,
+	}
 }
