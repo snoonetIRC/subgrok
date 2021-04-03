@@ -3,7 +3,8 @@
 package subpoll
 
 import (
-	"fmt"
+	"context"
+	"strings"
 	"time"
 
 	"github.com/vartanbeno/go-reddit/v2/reddit"
@@ -12,14 +13,24 @@ import (
 	"github.com/n7st/subgrok/internal/pkg/config"
 )
 
+import "github.com/davecgh/go-spew/spew"
+
+type Subscriptions struct {
+	ChannelToSubreddits map[string][]string
+	SubredditToChannels map[string][]string
+	Subreddits          []string
+}
+
 // Poller watches subreddits for new posts, pushing messages via its Bot member
 type Poller struct {
-	API *reddit.Client
-	Bot *subgrok.Bot // The IRC bot which will receive messages on post creation
+	API           *reddit.Client
+	Bot           *subgrok.Bot // The IRC bot which will receive messages on post creation
+	Subscriptions *Subscriptions
 }
 
 // Alerts are pushed to the IRC bot when a new post is made
 type Alert struct {
+	Channels  []string
 	SubReddit string
 	PostTitle string
 	PostURL   string
@@ -27,17 +38,64 @@ type Alert struct {
 
 // Load builds a new Poller
 func Load(config *config.Config, bot *subgrok.Bot) *Poller {
-	//client, err := reddit.NewReadonlyClient(*config.Reddit.Credentials())
+	//client, err := reddit.NewClient(*config.Reddit.Credentials())
 	client, err := reddit.NewReadonlyClient()
 
 	if err != nil {
 		panic(err)
 	}
 
-	return &Poller{
+	poller := &Poller{
 		API: client,
 		Bot: bot,
+
+		Subscriptions: &Subscriptions{
+			ChannelToSubreddits: map[string][]string{
+				"##Mike": {"metal", "homelab"},
+			},
+		},
 	}
+
+	poller.Subscriptions.Update()
+
+	return poller
+}
+
+func (s *Subscriptions) Update() {
+	s.invert()
+	s.createList()
+}
+
+func (s *Subscriptions) createList() {
+	var subreddits []string
+
+	for subreddit := range s.SubredditToChannels {
+		subreddits = append(subreddits, subreddit)
+	}
+
+	s.Subreddits = subreddits
+}
+
+// invert reorders the poller's subscription list to be one subreddit to many
+// channels
+func (s *Subscriptions) invert() {
+	inverted := make(map[string][]string)
+
+	for channel, subreddits := range s.ChannelToSubreddits {
+		for _, subreddit := range subreddits {
+			if inverted[subreddit] == nil {
+				inverted[subreddit] = []string{}
+			}
+
+			inverted[subreddit] = append(inverted[subreddit], channel)
+		}
+	}
+
+	s.SubredditToChannels = inverted
+}
+
+func (s *Subscriptions) ToSubredditString() string {
+	return strings.Join(s.Subreddits, "+")
 }
 
 // Poll looks at subreddits for new posts. If a new post is found, a message is
@@ -54,8 +112,45 @@ func (p *Poller) Poll() {
 
 	go func() {
 		for {
-			fmt.Println("Tick")
-			time.Sleep(10 * time.Second)
+			alerts, errs := p.checkSubscriptions()
+
+			spew.Dump(alerts)
+			spew.Dump(errs)
+
+			time.Sleep(60 * time.Second)
 		}
 	}()
+}
+
+func (p *Poller) checkSubscriptions() ([]*Alert, []error) {
+	var (
+		errors []error
+		alerts []*Alert
+	)
+
+	posts, _, err := p.API.Subreddit.HotPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
+		Limit: 5 * len(p.Subscriptions.Subreddits),
+	})
+
+	if err != nil {
+		errors = append(errors, err)
+	}
+
+	for _, post := range posts {
+		spew.Dump(post)
+
+		if err != nil {
+			errors = append(errors, err)
+			continue
+		}
+
+		alerts = append(alerts, &Alert{
+			Channels:  p.Subscriptions.SubredditToChannels[post.SubredditName],
+			SubReddit: post.SubredditName,
+			PostTitle: post.Title,
+			PostURL:   post.URL,
+		})
+	}
+
+	return alerts, errors
 }
