@@ -61,11 +61,14 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 	return poller
 }
 
+// Update reorders subscriptions so duplicate API calls are not made
 func (s *Subscriptions) Update() {
 	s.invert()
 	s.createList()
 }
 
+// createList formats the subscribed subreddits from every channel as a string
+// slice
 func (s *Subscriptions) createList() {
 	var subreddits []string
 
