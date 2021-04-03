@@ -14,6 +14,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const defaultRedditPollWaitTime = 60
+
 // ircConfig contains the bot's IRC connection configuration.
 type ircConfig struct {
 	AdminChannels  []string `yaml:"admin_channels"`
@@ -38,10 +40,13 @@ type ircConfig struct {
 
 // redditConfig contains the bot's reddit authentication configuration.
 type redditConfig struct {
-	ID       string `yaml:"id"`
-	Secret   string `yaml:"secret"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+	ID           string `yaml:"id"`
+	Secret       string `yaml:"secret"`
+	Username     string `yaml:"username"`
+	Password     string `yaml:"password"`
+	PollWaitTime int    `yaml:"poll_wait_time"`
+
+	PollWaitDuration time.Duration
 }
 
 // Config is the bot's configuration. It contains strictly IRC connection and
@@ -68,11 +73,25 @@ func Load() (*Config, error) {
 		return config, err
 	}
 
+	config.applyDefaults()
+
 	return config, nil
+}
+
+func (c *Config) applyDefaults() {
+	c.Reddit.applyDefaults()
 }
 
 func (ic *ircConfig) Hostname() string {
 	return fmt.Sprintf("%s:%d", ic.Server, ic.Port)
+}
+
+func (rc *redditConfig) applyDefaults() {
+	if rc.PollWaitTime < defaultRedditPollWaitTime {
+		rc.PollWaitTime = defaultRedditPollWaitTime
+	}
+
+	rc.PollWaitDuration = time.Duration(rc.PollWaitTime) * time.Second
 }
 
 func (rc *redditConfig) Credentials() *reddit.Credentials {

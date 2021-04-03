@@ -25,6 +25,7 @@ type Subscriptions struct {
 type Poller struct {
 	API           *reddit.Client
 	Bot           *subgrok.Bot // The IRC bot which will receive messages on post creation
+	Config        *config.Config
 	Subscriptions *Subscriptions
 }
 
@@ -46,8 +47,9 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 	}
 
 	poller := &Poller{
-		API: client,
-		Bot: bot,
+		API:    client,
+		Bot:    bot,
+		Config: config,
 
 		Subscriptions: &Subscriptions{
 			ChannelToSubreddits: map[string][]string{
@@ -120,7 +122,7 @@ func (p *Poller) Poll() {
 			spew.Dump(alerts)
 			spew.Dump(errs)
 
-			time.Sleep(60 * time.Second)
+			time.Sleep(p.Config.Reddit.PollWaitDuration)
 		}
 	}()
 }
