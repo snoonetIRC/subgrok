@@ -7,6 +7,7 @@
 package config
 
 import (
+	"fmt"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -31,7 +32,6 @@ type ircConfig struct {
 	MaxReconnect   int `yaml:"max_reconnect"`
 	ReconnectDelay int `yaml:"reconnect_delay"`
 
-	Hostname              string
 	ReconnectDelayMinutes time.Duration
 }
 
@@ -68,4 +68,8 @@ func Load() (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func (ic *ircConfig) Hostname() string {
+	return fmt.Sprintf("%s:%d", ic.Server, ic.Port)
 }

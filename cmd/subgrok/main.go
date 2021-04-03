@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/davecgh/go-spew/spew"
+	"github.com/n7st/subgrok/internal/app/subgrok"
 	"github.com/n7st/subgrok/internal/pkg/config"
 )
 
@@ -18,5 +18,6 @@ func main() {
 		panic(err)
 	}
 
-	spew.Dump(applicationConfig)
+	bot := subgrok.Load(applicationConfig)
+	bot.Connect()
 }
