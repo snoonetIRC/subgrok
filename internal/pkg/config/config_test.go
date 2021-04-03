@@ -2,6 +2,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	"github.com/shibukawa/configdir"
 	"github.com/stretchr/testify/assert"
@@ -30,12 +31,62 @@ reddit:
   secret: secret
   username: username
   password: password
+  poll_wait_time: 60
 `
 
 const exampleBadConfig = `
 ---
 nope: it's bad
 `
+
+const exampleBadRedditWaitTime = `
+---
+irc:
+  admin_channels:
+    - '##subgrok'
+  debug: true
+  ident: subgrokinstance
+  modes: +B
+  nickname: subgrokinstance
+  port: 6697
+  real_name: SubGrok
+  server: irc.snoonet.org
+  use_tls: true
+
+  nickserv_account: someaccount
+  nickserv_password: somepassword
+
+reddit:
+  id: 1234
+  secret: secret
+  username: username
+  password: password
+  poll_wait_time: 59
+`
+
+var exampleValidConfig = &Config{
+	IRC: &ircConfig{
+		AdminChannels:    []string{"##subgrok"},
+		Debug:            true,
+		Ident:            "subgrokinstance",
+		Modes:            "+B",
+		Nickname:         "subgrokinstance",
+		Port:             6697,
+		RealName:         "SubGrok",
+		Server:           "irc.snoonet.org",
+		UseTLS:           true,
+		NickservAccount:  "someaccount",
+		NickservPassword: "somepassword",
+	},
+	Reddit: &redditConfig{
+		ID:               "1234",
+		Secret:           "secret",
+		Username:         "username",
+		Password:         "password",
+		PollWaitTime:     60,
+		PollWaitDuration: time.Duration(60 * time.Second),
+	},
+}
 
 type processorMockValidContent struct{ mock.Mock }
 
@@ -65,6 +116,20 @@ func (c *processorMockInvalidContent) Directory(l *Loader, f *configdir.ConfigDi
 	return &configdir.Config{}
 }
 
+type processorMockInvalidRedditWaitTime struct{ mock.Mock }
+
+func (c *processorMockInvalidRedditWaitTime) Open(l *Loader) *configdir.ConfigDir {
+	return &configdir.ConfigDir{}
+}
+
+func (c *processorMockInvalidRedditWaitTime) Retrieve(l *Loader) ([]byte, error) {
+	return []byte(exampleBadRedditWaitTime), nil
+}
+
+func (c *processorMockInvalidRedditWaitTime) Directory(l *Loader, f *configdir.ConfigDir) *configdir.Config {
+	return &configdir.Config{}
+}
+
 func TestLoad(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -74,28 +139,8 @@ func TestLoad(t *testing.T) {
 		processorMock ConfigProcessor
 	}{
 		{
-			name: "With valid configuration",
-			want: &Config{
-				IRC: &ircConfig{
-					AdminChannels:    []string{"##subgrok"},
-					Debug:            true,
-					Ident:            "subgrokinstance",
-					Modes:            "+B",
-					Nickname:         "subgrokinstance",
-					Port:             6697,
-					RealName:         "SubGrok",
-					Server:           "irc.snoonet.org",
-					UseTLS:           true,
-					NickservAccount:  "someaccount",
-					NickservPassword: "somepassword",
-				},
-				Reddit: &redditConfig{
-					ID:       "1234",
-					Secret:   "secret",
-					Username: "username",
-					Password: "password",
-				},
-			},
+			name:          "With valid configuration",
+			want:          exampleValidConfig,
 			processorMock: &processorMockValidContent{},
 		},
 		{
@@ -111,6 +156,11 @@ func TestLoad(t *testing.T) {
 			wantErr:       true,
 			wantErrMsg:    "error message here",
 			processorMock: &processorMockErrorRaised{}, // from file_processor_test.go
+		},
+		{
+			name:          "reddit PollWaitTime below minimum",
+			want:          exampleValidConfig,
+			processorMock: &processorMockInvalidRedditWaitTime{},
 		},
 	}
 
@@ -129,6 +179,6 @@ func TestLoad(t *testing.T) {
 			return
 		}
 
-		assert.Equal(t, got, tt.want, "returned config should match")
+		assert.Equal(t, got, tt.want, "returned config should match ("+tt.name+")")
 	}
 }
