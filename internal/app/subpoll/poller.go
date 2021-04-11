@@ -27,6 +27,7 @@ type Poller struct {
 	Bot           *subgrok.Bot // The IRC bot which will receive messages on post creation
 	Config        *config.Config
 	Subscriptions *Subscriptions
+	LastPoll      *time.Time
 }
 
 // Alerts are pushed to the IRC bot when a new post is made
@@ -53,7 +54,7 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 
 		Subscriptions: &Subscriptions{
 			ChannelToSubreddits: map[string][]string{
-				"##Mike": {"metal", "homelab"},
+				"##Mike": {"metal", "homelab", "funny", "pics"},
 			},
 		},
 	}
@@ -119,8 +120,17 @@ func (p *Poller) Poll() {
 		for {
 			alerts, errs := p.checkSubscriptions()
 
+			for _, alert := range alerts {
+				for _, channel := range alert.Channels {
+					p.Bot.Connection.Privmsgf(channel, "%s %s %s", alert.SubReddit, alert.PostTitle, alert.PostURL)
+				}
+			}
+
+			if len(errs) > 0 {
+				spew.Dump(errs)
+			}
+
 			spew.Dump(alerts)
-			spew.Dump(errs)
 
 			time.Sleep(p.Config.Reddit.PollWaitDuration)
 		}
@@ -133,7 +143,7 @@ func (p *Poller) checkSubscriptions() ([]*Alert, []error) {
 		alerts []*Alert
 	)
 
-	posts, _, err := p.API.Subreddit.HotPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
+	posts, _, err := p.API.Subreddit.NewPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
 		Limit: 5 * len(p.Subscriptions.Subreddits),
 	})
 
@@ -142,7 +152,9 @@ func (p *Poller) checkSubscriptions() ([]*Alert, []error) {
 	}
 
 	for _, post := range posts {
-		spew.Dump(post)
+		if p.LastPoll == nil || !post.Created.After(*p.LastPoll) {
+			continue // Skip posts which were created before the last poll time
+		}
 
 		if err != nil {
 			errors = append(errors, err)
@@ -157,5 +169,14 @@ func (p *Poller) checkSubscriptions() ([]*Alert, []error) {
 		})
 	}
 
+	p.setLastPollTime()
+
 	return alerts, errors
+}
+
+// setLastPollTime sets the last time the poller ran. Posts retrieved by
+// go-reddit have a UTC Created time, so the poller also uses UTC.
+func (p *Poller) setLastPollTime() {
+	lastPoll := time.Now().UTC()
+	p.LastPoll = &lastPoll
 }
