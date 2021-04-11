@@ -10,6 +10,7 @@ import (
 
 	irc "github.com/thoj/go-ircevent"
 
+	"github.com/n7st/subgrok/internal/pkg/alert"
 	"github.com/n7st/subgrok/internal/pkg/config"
 )
 
@@ -63,4 +64,10 @@ func (b *Bot) joinChannels(channels []string) {
 	for _, channel := range channels {
 		b.Connection.Join(channel)
 	}
+	b.AlertChannel("##Mike", &alert.Alert{PostTitle: "foo"})
+}
+
+// AlertChannel sends a formatted "new post" announcement to a given channel.
+func (b *Bot) AlertChannel(channel string, alert *alert.Alert) {
+	b.Connection.Privmsg(channel, alert.ToString())
 }
