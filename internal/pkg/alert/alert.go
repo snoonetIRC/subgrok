@@ -3,6 +3,8 @@ package alert
 import (
 	"fmt"
 
+	ircColor "github.com/n7st/go-ircformat/color"
+	ircEmphasis "github.com/n7st/go-ircformat/emphasis"
 	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
@@ -31,11 +33,12 @@ func (a *Alert) postType() string {
 
 // ToString formats the alert as a string.
 func (a *Alert) ToString() string {
-	prefix := fmt.Sprintf("\x0303%s post:\x03", a.postType())
-	alert := fmt.Sprintf(`%s "%s" posted in /r/%s by %s. %s`, prefix, a.Post.Title, a.Post.SubredditName, a.Post.Author, a.Post.URL)
+	prefix := ircColor.Green(fmt.Sprintf("%s post:", a.postType()))
+	alert := fmt.Sprintf(`%s "%s" posted in /r/%s by %s. %s`,
+		prefix, a.Post.Title, a.Post.SubredditName, a.Post.Author, a.Post.URL)
 
 	if a.Post.NSFW {
-		alert = alert + " \x0304NSFW"
+		alert = alert + " " + ircEmphasis.Bold(ircColor.Red("NSFW"))
 	}
 
 	return alert
