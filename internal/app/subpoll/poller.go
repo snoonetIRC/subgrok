@@ -10,6 +10,7 @@ import (
 	"github.com/vartanbeno/go-reddit/v2/reddit"
 
 	"github.com/n7st/subgrok/internal/app/subgrok"
+	"github.com/n7st/subgrok/internal/pkg/alert"
 	"github.com/n7st/subgrok/internal/pkg/config"
 )
 
@@ -28,14 +29,6 @@ type Poller struct {
 	Config        *config.Config
 	Subscriptions *Subscriptions
 	LastPoll      *time.Time
-}
-
-// Alerts are pushed to the IRC bot when a new post is made
-type Alert struct {
-	Channels  []string
-	SubReddit string
-	PostTitle string
-	PostURL   string
 }
 
 // Load builds a new Poller
@@ -122,7 +115,7 @@ func (p *Poller) Poll() {
 
 			for _, alert := range alerts {
 				for _, channel := range alert.Channels {
-					p.Bot.Connection.Privmsgf(channel, "%s %s %s", alert.SubReddit, alert.PostTitle, alert.PostURL)
+					p.Bot.AlertChannel(channel, alert)
 				}
 			}
 
@@ -137,10 +130,10 @@ func (p *Poller) Poll() {
 	}()
 }
 
-func (p *Poller) checkSubscriptions() ([]*Alert, []error) {
+func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 	var (
 		errors []error
-		alerts []*Alert
+		alerts []*alert.Alert
 	)
 
 	posts, _, err := p.API.Subreddit.NewPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
@@ -161,11 +154,13 @@ func (p *Poller) checkSubscriptions() ([]*Alert, []error) {
 			continue
 		}
 
-		alerts = append(alerts, &Alert{
+		alerts = append(alerts, &alert.Alert{
+			Author:    post.Author,
 			Channels:  p.Subscriptions.SubredditToChannels[post.SubredditName],
-			SubReddit: post.SubredditName,
 			PostTitle: post.Title,
 			PostURL:   post.URL,
+			SubReddit: post.SubredditName,
+			NSFW:      post.NSFW,
 		})
 	}
 
