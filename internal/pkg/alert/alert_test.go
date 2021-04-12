@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
 func TestToString(t *testing.T) {
@@ -14,24 +15,28 @@ func TestToString(t *testing.T) {
 	}{
 		{
 			name: "Non-NSFW",
-			want: `"Title" posted in /r/SubReddit by Author. URL`,
+			want: `"Title" posted in /r/Subreddit by Author. URL`,
 			alert: &Alert{
-				Author:    "Author",
-				PostTitle: "Title",
-				PostURL:   "URL",
-				SubReddit: "SubReddit",
-				NSFW:      false,
+				Post: &reddit.Post{
+					Author:        "Author",
+					Title:         "Title",
+					URL:           "URL",
+					SubredditName: "Subreddit",
+					NSFW:          false,
+				},
 			},
 		},
 		{
 			name: "NSFW",
-			want: `"Title" posted in /r/SubReddit by Author. URL ` + "\x0304NSFW",
+			want: `"Title" posted in /r/Subreddit by Author. URL ` + "\x0304NSFW",
 			alert: &Alert{
-				Author:    "Author",
-				PostTitle: "Title",
-				PostURL:   "URL",
-				SubReddit: "SubReddit",
-				NSFW:      true,
+				Post: &reddit.Post{
+					Author:        "Author",
+					Title:         "Title",
+					URL:           "URL",
+					SubredditName: "Subreddit",
+					NSFW:          true,
+				},
 			},
 		},
 	}

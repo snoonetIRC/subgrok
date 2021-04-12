@@ -155,12 +155,8 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 		}
 
 		alerts = append(alerts, &alert.Alert{
-			Author:    post.Author,
-			Channels:  p.Subscriptions.SubredditToChannels[post.SubredditName],
-			PostTitle: post.Title,
-			PostURL:   post.URL,
-			SubReddit: post.SubredditName,
-			NSFW:      post.NSFW,
+			Channels: p.Subscriptions.SubredditToChannels[post.SubredditName],
+			Post:     post,
 		})
 	}
 

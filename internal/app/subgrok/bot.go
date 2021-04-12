@@ -64,7 +64,6 @@ func (b *Bot) joinChannels(channels []string) {
 	for _, channel := range channels {
 		b.Connection.Join(channel)
 	}
-	b.AlertChannel("##Mike", &alert.Alert{PostTitle: "foo"})
 }
 
 // AlertChannel sends a formatted "new post" announcement to a given channel.
