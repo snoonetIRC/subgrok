@@ -4,7 +4,6 @@ package subpoll
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/vartanbeno/go-reddit/v2/reddit"
@@ -12,22 +11,17 @@ import (
 	"github.com/n7st/subgrok/internal/app/subgrok"
 	"github.com/n7st/subgrok/internal/pkg/alert"
 	"github.com/n7st/subgrok/internal/pkg/config"
+	"github.com/n7st/subgrok/internal/pkg/subscription"
 )
 
 import "github.com/davecgh/go-spew/spew"
-
-type Subscriptions struct {
-	ChannelToSubreddits map[string][]string
-	SubredditToChannels map[string][]string
-	Subreddits          []string
-}
 
 // Poller watches subreddits for new posts, pushing messages via its Bot member
 type Poller struct {
 	API           *reddit.Client
 	Bot           *subgrok.Bot // The IRC bot which will receive messages on post creation
 	Config        *config.Config
-	Subscriptions *Subscriptions
+	Subscriptions *subscription.Subscriptions
 	LastPoll      *time.Time
 }
 
@@ -45,7 +39,7 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 		Bot:    bot,
 		Config: config,
 
-		Subscriptions: &Subscriptions{
+		Subscriptions: &subscription.Subscriptions{
 			ChannelToSubreddits: map[string][]string{
 				"##Mike": {"metal", "homelab", "funny", "pics"},
 			},
@@ -55,46 +49,6 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 	poller.Subscriptions.Update()
 
 	return poller
-}
-
-// Update reorders subscriptions so duplicate API calls are not made
-func (s *Subscriptions) Update() {
-	s.invert()
-	s.createList()
-}
-
-// createList formats the subscribed subreddits from every channel as a string
-// slice
-func (s *Subscriptions) createList() {
-	var subreddits []string
-
-	for subreddit := range s.SubredditToChannels {
-		subreddits = append(subreddits, subreddit)
-	}
-
-	s.Subreddits = subreddits
-}
-
-// invert reorders the poller's subscription list to be one subreddit to many
-// channels
-func (s *Subscriptions) invert() {
-	inverted := make(map[string][]string)
-
-	for channel, subreddits := range s.ChannelToSubreddits {
-		for _, subreddit := range subreddits {
-			if inverted[subreddit] == nil {
-				inverted[subreddit] = []string{}
-			}
-
-			inverted[subreddit] = append(inverted[subreddit], channel)
-		}
-	}
-
-	s.SubredditToChannels = inverted
-}
-
-func (s *Subscriptions) ToSubredditString() string {
-	return strings.Join(s.Subreddits, "+")
 }
 
 // Poll looks at subreddits for new posts. If a new post is found, a message is
