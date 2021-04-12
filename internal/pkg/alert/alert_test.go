@@ -14,8 +14,8 @@ func TestToString(t *testing.T) {
 		alert *Alert
 	}{
 		{
-			name: "Non-NSFW",
-			want: `"Title" posted in /r/Subreddit by Author. URL`,
+			name: "Non-NSFW link post",
+			want: "\x0303Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL`,
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
@@ -23,12 +23,13 @@ func TestToString(t *testing.T) {
 					URL:           "URL",
 					SubredditName: "Subreddit",
 					NSFW:          false,
+					IsSelfPost:    false,
 				},
 			},
 		},
 		{
-			name: "NSFW",
-			want: `"Title" posted in /r/Subreddit by Author. URL ` + "\x0304NSFW",
+			name: "NSFW link post",
+			want: "\x0303Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL ` + "\x0304NSFW",
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
@@ -36,6 +37,35 @@ func TestToString(t *testing.T) {
 					URL:           "URL",
 					SubredditName: "Subreddit",
 					NSFW:          true,
+					IsSelfPost:    false,
+				},
+			},
+		},
+		{
+			name: "Non-NSFW self post",
+			want: "\x0303Self post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL`,
+			alert: &Alert{
+				Post: &reddit.Post{
+					Author:        "Author",
+					Title:         "Title",
+					URL:           "URL",
+					SubredditName: "Subreddit",
+					NSFW:          false,
+					IsSelfPost:    true,
+				},
+			},
+		},
+		{
+			name: "NSFW self post",
+			want: "\x0303Self post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL ` + "\x0304NSFW",
+			alert: &Alert{
+				Post: &reddit.Post{
+					Author:        "Author",
+					Title:         "Title",
+					URL:           "URL",
+					SubredditName: "Subreddit",
+					NSFW:          true,
+					IsSelfPost:    true,
 				},
 			},
 		},
