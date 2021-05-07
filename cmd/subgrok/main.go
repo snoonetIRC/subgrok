@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/n7st/subgrok/internal/app/subgrok"
-	"github.com/n7st/subgrok/internal/app/subpoll"
-	"github.com/n7st/subgrok/internal/pkg/config"
+	"github.com/snoonetIRC/subgrok/internal/app/subgrok"
+	"github.com/snoonetIRC/subgrok/internal/app/subpoll"
+	"github.com/snoonetIRC/subgrok/internal/pkg/config"
 )
 
 const (

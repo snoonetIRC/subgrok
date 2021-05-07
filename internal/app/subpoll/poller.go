@@ -8,10 +8,10 @@ import (
 
 	"github.com/vartanbeno/go-reddit/v2/reddit"
 
-	"github.com/n7st/subgrok/internal/app/subgrok"
-	"github.com/n7st/subgrok/internal/pkg/alert"
-	"github.com/n7st/subgrok/internal/pkg/config"
-	"github.com/n7st/subgrok/internal/pkg/subscription"
+	"github.com/snoonetIRC/subgrok/internal/app/subgrok"
+	"github.com/snoonetIRC/subgrok/internal/pkg/alert"
+	"github.com/snoonetIRC/subgrok/internal/pkg/config"
+	"github.com/snoonetIRC/subgrok/internal/pkg/subscription"
 )
 
 import "github.com/davecgh/go-spew/spew"

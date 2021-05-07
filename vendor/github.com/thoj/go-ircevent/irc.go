@@ -124,7 +124,7 @@ func parseToEvent(msg string) (*Event, error) {
 					event.Tags[parts[0]] = unescapeTagValue(parts[1])
 				}
 			}
-			msg = msg[i+1:]
+			msg = msg[i+1 : len(msg)]
 		} else {
 			return nil, errors.New("Malformed msg from server")
 		}
@@ -133,7 +133,7 @@ func parseToEvent(msg string) (*Event, error) {
 	if msg[0] == ':' {
 		if i := strings.Index(msg, " "); i > -1 {
 			event.Source = msg[1:i]
-			msg = msg[i+1:]
+			msg = msg[i+1 : len(msg)]
 
 		} else {
 			return nil, errors.New("Malformed msg from server")

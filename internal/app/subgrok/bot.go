@@ -10,8 +10,8 @@ import (
 
 	irc "github.com/thoj/go-ircevent"
 
-	"github.com/n7st/subgrok/internal/pkg/alert"
-	"github.com/n7st/subgrok/internal/pkg/config"
+	"github.com/snoonetIRC/subgrok/internal/pkg/alert"
+	"github.com/snoonetIRC/subgrok/internal/pkg/config"
 )
 
 // Bot is a SubGrok instance

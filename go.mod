@@ -1,4 +1,4 @@
-module github.com/n7st/subgrok
+module github.com/snoonetIRC/subgrok
 
 go 1.16
 
