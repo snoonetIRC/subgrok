@@ -75,6 +75,7 @@ func TestUpdate(t *testing.T) {
 		tt.subscriptions.Update()
 
 		if !cmp.Equal(tt.subscriptions, tt.want) {
+			t.Logf("got = %v want = %v", tt.subscriptions, tt.want)
 			t.Fail()
 		}
 	}

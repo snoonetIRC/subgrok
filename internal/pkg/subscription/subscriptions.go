@@ -1,6 +1,9 @@
 package subscription
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 type Subscriptions struct {
 	ChannelToSubreddits map[string][]string
@@ -22,6 +25,8 @@ func (s *Subscriptions) createList() {
 	for subreddit := range s.SubredditToChannels {
 		subreddits = append(subreddits, subreddit)
 	}
+
+	sort.Strings(subreddits)
 
 	s.Subreddits = subreddits
 }
