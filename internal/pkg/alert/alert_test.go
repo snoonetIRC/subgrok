@@ -69,6 +69,20 @@ func TestToString(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Post with spoiler",
+			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL ` + "\x02\x037Spoiler\x03\x02",
+			alert: &Alert{
+				Post: &reddit.Post{
+					Author:        "Author",
+					Title:         "Title",
+					URL:           "URL",
+					SubredditName: "Subreddit",
+					Spoiler:       true,
+					IsSelfPost:    false,
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {

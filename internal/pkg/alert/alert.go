@@ -41,5 +41,9 @@ func (a *Alert) ToString() string {
 		alert = alert + " " + ircEmphasis.Bold(ircColor.Red("NSFW"))
 	}
 
+	if a.Post.Spoiler {
+		alert = alert + " " + ircEmphasis.Bold(ircColor.Orange("Spoiler"))
+	}
+
 	return alert
 }
