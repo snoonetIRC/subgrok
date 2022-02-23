@@ -37,6 +37,8 @@ func (s *Subscriptions) invert() {
 	inverted := make(map[string][]string)
 
 	for channel, subreddits := range s.ChannelToSubreddits {
+		sort.Strings(subreddits)
+
 		for _, subreddit := range subreddits {
 			if inverted[subreddit] == nil {
 				inverted[subreddit] = []string{}
