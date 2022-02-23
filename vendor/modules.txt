@@ -2,48 +2,56 @@
 ## explicit
 github.com/davecgh/go-spew/spew
 # github.com/golang/protobuf v1.2.0
+## explicit
 github.com/golang/protobuf/proto
 # github.com/google/go-cmp v0.5.5
-## explicit
+## explicit; go 1.8
 github.com/google/go-cmp/cmp
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
 # github.com/google/go-querystring v1.0.0
+## explicit
 github.com/google/go-querystring/query
 # github.com/n7st/go-ircformat v1.0.0
-## explicit
+## explicit; go 1.16
 github.com/n7st/go-ircformat/color
 github.com/n7st/go-ircformat/emphasis
 # github.com/pmezard/go-difflib v1.0.0
+## explicit
 github.com/pmezard/go-difflib/difflib
 # github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0
 ## explicit
 github.com/shibukawa/configdir
 # github.com/stretchr/objx v0.1.0
+## explicit
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.7.0
-## explicit
+## explicit; go 1.13
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 # github.com/thoj/go-ircevent v0.0.0-20190807115034-8e7ce4b5a1eb
-## explicit
+## explicit; go 1.12
 github.com/thoj/go-ircevent
 # github.com/vartanbeno/go-reddit/v2 v2.0.1
-## explicit
+## explicit; go 1.15
 github.com/vartanbeno/go-reddit/v2/reddit
 # golang.org/x/net v0.0.0-20190108225652-1e06a53dbb7e
+## explicit
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 # golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+## explicit; go 1.11
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
 # golang.org/x/text v0.3.2
+## explicit
 golang.org/x/text/encoding
 golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/transform
 # google.golang.org/appengine v1.4.0
+## explicit
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
@@ -55,4 +63,5 @@ google.golang.org/appengine/urlfetch
 ## explicit
 gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+## explicit
 gopkg.in/yaml.v3
