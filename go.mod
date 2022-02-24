@@ -10,7 +10,7 @@ require (
 	github.com/thoj/go-ircevent v0.0.0-20190807115034-8e7ce4b5a1eb
 	github.com/vartanbeno/go-reddit/v2 v2.0.1
 	go.etcd.io/bbolt v1.3.6
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.8
 )
 
 require (
