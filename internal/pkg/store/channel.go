@@ -67,3 +67,24 @@ func (f *FileDB) GetSubscriptions() (map[string]map[string]bool, error) {
 
 	return subscriptions, err
 }
+
+func (f *FileDB) GetChannels() ([]string, error) {
+	subscriptions, err := f.GetSubscriptions()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var channels []string
+
+	for channel, subreddits := range subscriptions {
+		for _, subscribed := range subreddits {
+			if subscribed {
+				channels = append(channels, channel)
+				break
+			}
+		}
+	}
+
+	return channels, nil
+}

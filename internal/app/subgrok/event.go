@@ -39,8 +39,15 @@ func (b *Bot) callback001(e *irc.Event) {
 		b.Connection.Privmsgf("nickserv", "identify %s %s", b.Config.IRC.NickservAccount, b.Config.IRC.NickservPassword)
 	}
 
-	// TODO: join stored channels as well as administrative ones
 	b.joinChannels(b.Config.IRC.AdminChannels)
+
+	channels, err := b.Database.GetChannels()
+
+	if err == nil {
+		b.joinChannels(channels)
+	} else {
+		b.Connection.Log.Printf("Error retrieving stored channels: " + err.Error())
+	}
 }
 
 // callback353 runs when a response to /NAMES is seen
