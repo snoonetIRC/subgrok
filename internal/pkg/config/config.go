@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	defaultCommandPrefix      = "!"
-	defaultRedditPollWaitTime = 60
+	defaultChannelMaximumSubscriptions = 20
+	defaultCommandPrefix               = "!"
+	defaultRedditPollWaitTime          = 60
 )
 
 type databaseConfig struct {
@@ -58,13 +59,18 @@ type redditConfig struct {
 	PollWaitDuration time.Duration
 }
 
+type applicationConfig struct {
+	ChannelMaximumSubscriptions int `yaml:"channel_maximum_subscriptions"`
+}
+
 // Config is the bot's configuration. It contains strictly IRC connection and
 // reddit auth configuration, and should never contain state information such as
 // channel subreddit subscription data.
 type Config struct {
-	Database *databaseConfig `yaml:"database"`
-	IRC      *ircConfig      `yaml:"irc"`
-	Reddit   *redditConfig   `yaml:"reddit"`
+	Application *applicationConfig `yaml:"application"`
+	Database    *databaseConfig    `yaml:"database"`
+	IRC         *ircConfig         `yaml:"irc"`
+	Reddit      *redditConfig      `yaml:"reddit"`
 }
 
 // Load processes the bot's configuration
@@ -84,7 +90,7 @@ func Load() (*Config, error) {
 	}
 
 	if config.Database == nil || config.Database.Filepath == "" {
-		return config, errors.New("A database filepath is required (config database.filepath)")
+		return config, errors.New("a database filepath is required (config database.filepath)")
 	}
 
 	config.applyDefaults()
@@ -102,6 +108,12 @@ func (c *Config) applyDefaults() {
 	if c.IRC == nil {
 		c.IRC = &ircConfig{}
 	}
+
+	if c.Application == nil {
+		c.Application = &applicationConfig{}
+	}
+
+	c.Application.applyDefaults()
 
 	if c.IRC.CommandPrefix == "" {
 		c.IRC.CommandPrefix = defaultCommandPrefix
@@ -126,5 +138,11 @@ func (rc *redditConfig) Credentials() *reddit.Credentials {
 		Secret:   rc.Secret,
 		Username: rc.Username,
 		Password: rc.Password,
+	}
+}
+
+func (ac *applicationConfig) applyDefaults() {
+	if ac.ChannelMaximumSubscriptions == 0 {
+		ac.ChannelMaximumSubscriptions = defaultChannelMaximumSubscriptions
 	}
 }

@@ -96,6 +96,7 @@ var exampleValidConfig = &Config{
 		PollWaitTime:     60,
 		PollWaitDuration: time.Duration(60 * time.Second),
 	},
+	Application: &applicationConfig{ChannelMaximumSubscriptions: defaultChannelMaximumSubscriptions},
 }
 
 type processorMockValidContent struct{ mock.Mock }
@@ -185,7 +186,7 @@ func TestLoad(t *testing.T) {
 			name:          "Missing database filepath",
 			want:          &Config{},
 			wantErr:       true,
-			wantErrMsg:    "A database filepath is required (config database.filepath)",
+			wantErrMsg:    "a database filepath is required (config database.filepath)",
 			processorMock: &processorMockInvalidDatabaseFilepath{},
 		},
 		{

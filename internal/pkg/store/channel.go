@@ -88,3 +88,43 @@ func (f *FileDB) GetChannels() ([]string, error) {
 
 	return channels, nil
 }
+
+func (f *FileDB) GetChannelSubscriptions(name string) ([]string, error) {
+	var subscriptions []string
+
+	err := f.DB.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(ChannelBucketKey))
+
+		if bucket == nil {
+			panic("channel bucket doesn't exist")
+		}
+
+		channelBucket := bucket.Bucket([]byte(name))
+
+		if channelBucket == nil {
+			return nil
+		}
+
+		return channelBucket.ForEach(func(k, v []byte) error {
+			subscriptionString := string(v)
+
+			if subscriptionString == "true" {
+				subscriptions = append(subscriptions, string(k))
+			}
+
+			return nil
+		})
+	})
+
+	return subscriptions, err
+}
+
+func (f *FileDB) GetChannelSubscriptionCount(name string) (int, error) {
+	subscriptions, err := f.GetChannelSubscriptions(name)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return len(subscriptions), nil
+}
