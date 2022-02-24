@@ -10,7 +10,7 @@ import (
 
 const (
 	errNoArguments               = "A subreddit name is required (e.g. 'irc')"
-	errSubredditTooLong          = "Subreddit name is too long (maximum 20 characters)";
+	errSubredditTooLong          = "Subreddit name is too long (maximum 20 characters)"
 	errSubredditValidationFailed = "Subreddit name failed validation"
 
 	subredditPrefix = "/r/"
