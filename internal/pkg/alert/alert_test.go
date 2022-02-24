@@ -15,12 +15,12 @@ func TestToString(t *testing.T) {
 	}{
 		{
 			name: "Non-NSFW link post",
-			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL`,
+			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. https://reddit.comURL`,
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
 					Title:         "Title",
-					URL:           "URL",
+					Permalink:     "URL",
 					SubredditName: "Subreddit",
 					NSFW:          false,
 					IsSelfPost:    false,
@@ -29,12 +29,12 @@ func TestToString(t *testing.T) {
 		},
 		{
 			name: "NSFW link post",
-			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL ` + "\x02\x034NSFW\x03\x02",
+			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. https://reddit.comURL ` + "\x02\x034NSFW\x03\x02",
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
 					Title:         "Title",
-					URL:           "URL",
+					Permalink:     "URL",
 					SubredditName: "Subreddit",
 					NSFW:          true,
 					IsSelfPost:    false,
@@ -43,12 +43,12 @@ func TestToString(t *testing.T) {
 		},
 		{
 			name: "Non-NSFW self post",
-			want: "\x033Self post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL`,
+			want: "\x033Self post:\x03" + ` "Title" posted in /r/Subreddit by Author. https://reddit.comURL`,
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
 					Title:         "Title",
-					URL:           "URL",
+					Permalink:     "URL",
 					SubredditName: "Subreddit",
 					NSFW:          false,
 					IsSelfPost:    true,
@@ -57,12 +57,12 @@ func TestToString(t *testing.T) {
 		},
 		{
 			name: "NSFW self post",
-			want: "\x033Self post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL ` + "\x02\x034NSFW\x03\x02",
+			want: "\x033Self post:\x03" + ` "Title" posted in /r/Subreddit by Author. https://reddit.comURL ` + "\x02\x034NSFW\x03\x02",
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
 					Title:         "Title",
-					URL:           "URL",
+					Permalink:     "URL",
 					SubredditName: "Subreddit",
 					NSFW:          true,
 					IsSelfPost:    true,
@@ -71,12 +71,12 @@ func TestToString(t *testing.T) {
 		},
 		{
 			name: "Post with spoiler",
-			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. URL ` + "\x02\x037Spoiler\x03\x02",
+			want: "\x033Link post:\x03" + ` "Title" posted in /r/Subreddit by Author. https://reddit.comURL ` + "\x02\x037Spoiler\x03\x02",
 			alert: &Alert{
 				Post: &reddit.Post{
 					Author:        "Author",
 					Title:         "Title",
-					URL:           "URL",
+					Permalink:     "URL",
 					SubredditName: "Subreddit",
 					Spoiler:       true,
 					IsSelfPost:    false,
