@@ -47,7 +47,55 @@ Permitted to channel half-operators and above only.
 Check the [releases](https://github.com/snoonetIRC/subgrok/releases) page for
 the application's most recent releases.
 
-Linux x86_64 binaries are automatically attached to every build.
+Linux x86_64 binaries are automatically attached to every build. This guide
+assumes you would like to host the bot on a 64 bit Linux server.
+
+### Configuration reference
+
+```yaml
+---
+# "irc" is configuration used for the IRC connection
+irc:
+  # admin_channels are joined by default, even if they do not have any subscriptions.
+  admin_channels:
+    - '##my-subgrok-admin-channel'
+  debug: false            # Display verbose IRC debug-level information
+  ident: subgrok          # The "username" the bot will connect with
+  modes: +B               # umodes that'll be set against the bot (at least +B recommended)
+  nickname: subgrok       # The nickname the bot will use
+  port: 6697              # IRC port
+  real_name: subgrok      # Realname
+  server: irc.snoonet.org # IRC server
+  use_tls: true           # Boolean, whether the bot should connect using SSL
+
+  nickserv_account: my-nickserv-account   # The nickserv username the bot will identify with
+  nickserv_password: my-nickserv-password # The nickserv password the bot will identify with
+
+# "reddit" is configuration for our use of the reddit API
+reddit:
+  poll_wait_time: 600 # Time to wait (seconds) between reddit API calls
+
+# "database" is configuration for the database
+database:
+  filepath: '~/.config/snoonet/subgrok/file.db' # Path to use as a file database
+
+# "application" is configuration for the bot itself
+application:
+  channel_maximum_subscriptions: 20 # The maximum number of subreddits any channel may watch
+```
+
+### Running the bot
+
+By default, on Linux systems, the bot will look for a configuration file in
+`~/.config/snoonet/subgrok/config.yaml`. It won't launch if one isn't found.
+
+After downloading the most recent binary, you can run it by issuing the following
+commands:
+
+```
+% chmod +x subgrok
+% ./subgrok
+```
 
 ## Development
 
