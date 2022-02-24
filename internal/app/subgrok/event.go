@@ -23,6 +23,7 @@ func events(b *Bot) map[string]func(e *irc.Event) {
 	return map[string]func(e *irc.Event){
 		"001":     b.callback001,
 		"353":     b.callback353,
+		"INVITE":  b.callbackInvite,
 		"MODE":    b.callbackMode,
 		"PRIVMSG": b.callbackPrivmsg,
 	}
@@ -55,6 +56,12 @@ func (b *Bot) callback353(e *irc.Event) {
 			b.toggleChannelOperator(channel, removeOperatorPrefixes(nickname), true)
 		}
 	}
+}
+
+// callbackInvite runs when the bot is invited to a channel. It will attempt to
+// join the channel it was invited to.
+func (b *Bot) callbackInvite(e *irc.Event) {
+	b.joinChannels([]string{e.Arguments[1]})
 }
 
 func (b *Bot) callbackMode(e *irc.Event) {
