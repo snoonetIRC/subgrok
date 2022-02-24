@@ -15,7 +15,7 @@ const (
 
 // Alerts are pushed to the IRC bot when a new post is made
 type Alert struct {
-	Channels []string
+	Channels map[string]bool
 	Post     *reddit.Post
 }
 

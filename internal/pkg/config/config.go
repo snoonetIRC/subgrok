@@ -7,6 +7,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -14,11 +15,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const defaultRedditPollWaitTime = 60
+const (
+	defaultCommandPrefix      = "!"
+	defaultRedditPollWaitTime = 60
+)
+
+type databaseConfig struct {
+	Filepath string `yaml:"filepath"`
+}
 
 // ircConfig contains the bot's IRC connection configuration.
 type ircConfig struct {
 	AdminChannels  []string `yaml:"admin_channels"`
+	CommandPrefix  string   `yaml:"command_prefix"`
 	Debug          bool     `yaml:"debug"` // Debug also handles "verbose" mode
 	Ident          string   `yaml:"ident"`
 	Modes          string   `yaml:"modes"`
@@ -53,8 +62,9 @@ type redditConfig struct {
 // reddit auth configuration, and should never contain state information such as
 // channel subreddit subscription data.
 type Config struct {
-	IRC    *ircConfig    `yaml:"irc"`
-	Reddit *redditConfig `yaml:"reddit"`
+	Database *databaseConfig `yaml:"database"`
+	IRC      *ircConfig      `yaml:"irc"`
+	Reddit   *redditConfig   `yaml:"reddit"`
 }
 
 // Load processes the bot's configuration
@@ -73,13 +83,29 @@ func Load() (*Config, error) {
 		return config, err
 	}
 
+	if config.Database == nil || config.Database.Filepath == "" {
+		return config, errors.New("A database filepath is required (config database.filepath)")
+	}
+
 	config.applyDefaults()
 
 	return config, nil
 }
 
 func (c *Config) applyDefaults() {
+	if c.Reddit == nil {
+		c.Reddit = &redditConfig{}
+	}
+
 	c.Reddit.applyDefaults()
+
+	if c.IRC == nil {
+		c.IRC = &ircConfig{}
+	}
+
+	if c.IRC.CommandPrefix == "" {
+		c.IRC.CommandPrefix = defaultCommandPrefix
+	}
 }
 
 func (ic *ircConfig) Hostname() string {

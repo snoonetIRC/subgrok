@@ -11,6 +11,9 @@ import (
 
 const exampleConfig = `
 ---
+database:
+  filepath: whatever
+
 irc:
   admin_channels:
     - '##subgrok'
@@ -39,8 +42,13 @@ const exampleBadConfig = `
 nope: it's bad
 `
 
+const exampleConfigNoDatabaseFilepath = ``
+
 const exampleBadRedditWaitTime = `
 ---
+database:
+  filepath: whatever
+
 irc:
   admin_channels:
     - '##subgrok'
@@ -65,8 +73,10 @@ reddit:
 `
 
 var exampleValidConfig = &Config{
+	Database: &databaseConfig{Filepath: "whatever"},
 	IRC: &ircConfig{
 		AdminChannels:    []string{"##subgrok"},
+		CommandPrefix:    "!",
 		Debug:            true,
 		Ident:            "subgrokinstance",
 		Modes:            "+B",
@@ -116,6 +126,20 @@ func (c *processorMockInvalidContent) Directory(l *Loader, f *configdir.ConfigDi
 	return &configdir.Config{}
 }
 
+type processorMockInvalidDatabaseFilepath struct{ mock.Mock }
+
+func (c *processorMockInvalidDatabaseFilepath) Open(l *Loader) *configdir.ConfigDir {
+	return &configdir.ConfigDir{}
+}
+
+func (c *processorMockInvalidDatabaseFilepath) Retrieve(l *Loader) ([]byte, error) {
+	return []byte(exampleConfigNoDatabaseFilepath), nil
+}
+
+func (c *processorMockInvalidDatabaseFilepath) Directory(l *Loader, f *configdir.ConfigDir) *configdir.Config {
+	return &configdir.Config{}
+}
+
 type processorMockInvalidRedditWaitTime struct{ mock.Mock }
 
 func (c *processorMockInvalidRedditWaitTime) Open(l *Loader) *configdir.ConfigDir {
@@ -156,6 +180,13 @@ func TestLoad(t *testing.T) {
 			wantErr:       true,
 			wantErrMsg:    "error message here",
 			processorMock: &processorMockErrorRaised{}, // from file_processor_test.go
+		},
+		{
+			name:          "Missing database filepath",
+			want:          &Config{},
+			wantErr:       true,
+			wantErrMsg:    "A database filepath is required (config database.filepath)",
+			processorMock: &processorMockInvalidDatabaseFilepath{},
 		},
 		{
 			name:          "reddit PollWaitTime below minimum",
