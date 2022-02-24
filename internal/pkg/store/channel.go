@@ -1,5 +1,7 @@
 package store
 
+import bolt "go.etcd.io/bbolt"
+
 const ChannelBucketKey = "channel"
 
 func (f *FileDB) ToggleSubscription(channel string, subreddit string, subscribed bool) error {
