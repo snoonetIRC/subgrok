@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	commandSubscribe   = "subscribe"
-	commandUnsubscribe = "unsubscribe"
+	commandSubscribe     = "subscribe"
+	commandSubscriptions = "subscriptions"
+	commandUnsubscribe   = "unsubscribe"
 
 	prefixChannel      = "#"
 	prefixHalfOperator = "%"
@@ -104,12 +105,23 @@ func (b *Bot) callbackPrivmsg(e *irc.Event) {
 
 	b.Connection.Log.Println(e.Message())
 
+	arguments := &command.SubscribeToggleArguments{
+		Channel:          channel,
+		Config:           b.Config,
+		Database:         b.Database,
+		MessageArguments: messageToArguments(e.Message()),
+	}
+
 	// Keep it simple for now; we only have two commands (consider dispatch map
 	// if the scope grows)
 	if b.isCommand(e.Message(), commandSubscribe) {
-		response = command.ToggleSubscription(channel, messageToArguments(e.Message()), true, b.Database)
+		arguments.Subscribed = true
+		response = command.ToggleSubscription(arguments)
 	} else if b.isCommand(e.Message(), commandUnsubscribe) {
-		response = command.ToggleSubscription(channel, messageToArguments(e.Message()), false, b.Database)
+		arguments.Subscribed = false
+		response = command.ToggleSubscription(arguments)
+	} else if b.isCommand(e.Message(), commandSubscriptions) {
+		response = command.ListSubscriptions(arguments)
 	}
 
 	if response != "" {
