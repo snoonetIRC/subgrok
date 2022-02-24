@@ -5,6 +5,8 @@ subreddits.
 
 ## Bot usage
 
+The bot should be invited to your channel (`/INVITE subgrok #channelname`).
+
 The bot has three commands:
 
 ### `!subscribe <subreddit name here>`
