@@ -67,6 +67,7 @@ func (p *Poller) Poll() {
 			for _, alert := range alerts {
 				for channel := range alert.Channels {
 					p.Bot.AlertChannel(channel, alert)
+					time.Sleep(5 * time.Second)
 				}
 			}
 
