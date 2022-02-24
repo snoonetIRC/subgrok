@@ -34,8 +34,8 @@ func (a *Alert) postType() string {
 // ToString formats the alert as a string.
 func (a *Alert) ToString() string {
 	prefix := ircColor.Green(fmt.Sprintf("%s post:", a.postType()))
-	alert := fmt.Sprintf(`%s "%s" posted in /r/%s by %s. %s`,
-		prefix, a.Post.Title, a.Post.SubredditName, a.Post.Author, a.Post.URL)
+	alert := fmt.Sprintf(`%s "%s" posted in /r/%s by %s. https://reddit.com%s`,
+		prefix, a.Post.Title, a.Post.SubredditName, a.Post.Author, a.Post.Permalink)
 
 	if a.Post.NSFW {
 		alert = alert + " " + ircEmphasis.Bold(ircColor.Red("NSFW"))
