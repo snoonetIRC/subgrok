@@ -15,8 +15,6 @@ import (
 	"github.com/snoonetIRC/subgrok/internal/pkg/subscription"
 )
 
-//import "github.com/davecgh/go-spew/spew"
-
 // Poller watches subreddits for new posts, pushing messages via its Bot member
 type Poller struct {
 	API           *reddit.Client
@@ -40,14 +38,10 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 		Bot:    bot,
 		Config: config,
 
-		Subscriptions: &subscription.Subscriptions{
-			ChannelToSubreddits: map[string]map[string]bool{
-				"##Mike": {"metal": true, "homelab": true, "funny": true, "pics": true},
-			},
-		},
+		Subscriptions: &subscription.Subscriptions{},
 	}
 
-	poller.Subscriptions.Update()
+	poller.Subscriptions.ReloadFromDatabase(bot.Database)
 
 	return poller
 }
@@ -68,7 +62,7 @@ func (p *Poller) Poll() {
 		for {
 			alerts, errs := p.checkSubscriptions()
 
-			p.updateSubscriptions()
+			p.Subscriptions.ReloadFromDatabase(p.Bot.Database)
 
 			for _, alert := range alerts {
 				for channel := range alert.Channels {
@@ -85,8 +79,6 @@ func (p *Poller) Poll() {
 
 				p.Bot.Connection.Log.Printf("Received errors from reddit: %s", strings.Join(errorStrings, ", "))
 			}
-
-			//spew.Dump(alerts)
 
 			time.Sleep(p.Config.Reddit.PollWaitDuration)
 		}
@@ -126,11 +118,6 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 	p.setLastPollTime()
 
 	return alerts, redditErrors
-}
-
-func (p *Poller) updateSubscriptions() {
-	// TODO: retrieve subscription changes from bot cache, set them, clean up
-	p.Bot.Database.GetSubscriptions()
 }
 
 // setLastPollTime sets the last time the poller ran. Posts retrieved by

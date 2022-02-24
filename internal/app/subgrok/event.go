@@ -95,9 +95,9 @@ func (b *Bot) callbackPrivmsg(e *irc.Event) {
 	// Keep it simple for now; we only have two commands (consider dispatch map
 	// if the scope grows)
 	if b.isCommand(e.Message(), commandSubscribe) {
-		response = command.Subscribe(channel, messageToArguments(e.Message()), b.Database)
+		response = command.ToggleSubscription(channel, messageToArguments(e.Message()), true, b.Database)
 	} else if b.isCommand(e.Message(), commandUnsubscribe) {
-		response = "Unsubscribe"
+		response = command.ToggleSubscription(channel, messageToArguments(e.Message()), false, b.Database)
 	}
 
 	if response != "" {

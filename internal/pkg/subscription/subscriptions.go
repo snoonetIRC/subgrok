@@ -3,12 +3,25 @@ package subscription
 import (
 	"sort"
 	"strings"
+
+	"github.com/snoonetIRC/subgrok/internal/pkg/store"
 )
 
 type Subscriptions struct {
 	ChannelToSubreddits map[string]map[string]bool
 	SubredditToChannels map[string]map[string]bool
 	Subreddits          []string
+}
+
+func (s *Subscriptions) ReloadFromDatabase(db *store.FileDB) {
+	subscriptions, err := db.GetSubscriptions()
+
+	if err != nil {
+		panic(err) // TODO
+	}
+
+	s.ChannelToSubreddits = subscriptions
+	s.Update()
 }
 
 // Update reorders subscriptions so duplicate API calls are not made
