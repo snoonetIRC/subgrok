@@ -2,13 +2,16 @@ package command
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/snoonetIRC/subgrok/internal/pkg/store"
 )
 
 const (
-	errNoArguments = "A subreddit name is required (e.g. 'irc')"
+	errNoArguments               = "A subreddit name is required (e.g. 'irc')"
+	errSubredditTooLong          = "Subreddit name is too long (maximum 20 characters)";
+	errSubredditValidationFailed = "Subreddit name failed validation"
 
 	subredditPrefix = "/r/"
 )
@@ -20,7 +23,17 @@ func ToggleSubscription(channel string, messageArguments []string, subscribed bo
 		return errNoArguments
 	}
 
-	err := s.ToggleSubscription(channel, subreddit, subscribed)
+	if len([]rune(subreddit)) > 20 {
+		return errSubredditTooLong
+	}
+
+	matched, err := regexp.MatchString(`^[A-Za-z0-9-_]+$`, subreddit)
+
+	if err != nil || !matched {
+		return errSubredditValidationFailed
+	}
+
+	err = s.ToggleSubscription(channel, subreddit, subscribed)
 
 	if err != nil {
 		failureMessage := "Failed to subscribe %s to %s"
