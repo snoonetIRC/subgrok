@@ -6,8 +6,8 @@ import (
 )
 
 type Subscriptions struct {
-	ChannelToSubreddits map[string][]string
-	SubredditToChannels map[string][]string
+	ChannelToSubreddits map[string]map[string]bool
+	SubredditToChannels map[string]map[string]bool
 	Subreddits          []string
 }
 
@@ -34,17 +34,21 @@ func (s *Subscriptions) createList() {
 // invert reorders the poller's subscription list to be one subreddit to many
 // channels
 func (s *Subscriptions) invert() {
-	inverted := make(map[string][]string)
+	inverted := make(map[string]map[string]bool)
 
 	for channel, subreddits := range s.ChannelToSubreddits {
-		sort.Strings(subreddits)
-
-		for _, subreddit := range subreddits {
-			if inverted[subreddit] == nil {
-				inverted[subreddit] = []string{}
+		for subreddit, subscribed := range subreddits {
+			if !subscribed {
+				// The IRC channel is not subscribed to receive notifications for
+				// this subreddit, so do not add it to the list
+				continue
 			}
 
-			inverted[subreddit] = append(inverted[subreddit], channel)
+			if inverted[subreddit] == nil {
+				inverted[subreddit] = make(map[string]bool)
+			}
+
+			inverted[subreddit][channel] = true
 		}
 	}
 

@@ -4,6 +4,7 @@ package subpoll
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/vartanbeno/go-reddit/v2/reddit"
@@ -14,7 +15,7 @@ import (
 	"github.com/snoonetIRC/subgrok/internal/pkg/subscription"
 )
 
-import "github.com/davecgh/go-spew/spew"
+//import "github.com/davecgh/go-spew/spew"
 
 // Poller watches subreddits for new posts, pushing messages via its Bot member
 type Poller struct {
@@ -40,8 +41,8 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 		Config: config,
 
 		Subscriptions: &subscription.Subscriptions{
-			ChannelToSubreddits: map[string][]string{
-				"##Mike": {"metal", "homelab", "funny", "pics"},
+			ChannelToSubreddits: map[string]map[string]bool{
+				"##Mike": {"metal": true, "homelab": true, "funny": true, "pics": true},
 			},
 		},
 	}
@@ -67,17 +68,25 @@ func (p *Poller) Poll() {
 		for {
 			alerts, errs := p.checkSubscriptions()
 
+			p.updateSubscriptions()
+
 			for _, alert := range alerts {
-				for _, channel := range alert.Channels {
+				for channel, _ := range alert.Channels {
 					p.Bot.AlertChannel(channel, alert)
 				}
 			}
 
 			if len(errs) > 0 {
-				spew.Dump(errs)
+				var errorStrings []string
+
+				for _, err := range errs {
+					errorStrings = append(errorStrings, err.Error())
+				}
+
+				p.Bot.Connection.Log.Printf("Received errors from reddit: %s", strings.Join(errorStrings, ", "))
 			}
 
-			spew.Dump(alerts)
+			//spew.Dump(alerts)
 
 			time.Sleep(p.Config.Reddit.PollWaitDuration)
 		}
@@ -86,7 +95,7 @@ func (p *Poller) Poll() {
 
 func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 	var (
-		errors []error
+		redditErrors []error
 		alerts []*alert.Alert
 	)
 
@@ -95,7 +104,7 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 	})
 
 	if err != nil {
-		errors = append(errors, err)
+		redditErrors = append(redditErrors, err)
 	}
 
 	for _, post := range posts {
@@ -104,7 +113,7 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 		}
 
 		if err != nil {
-			errors = append(errors, err)
+			redditErrors = append(redditErrors, err)
 			continue
 		}
 
@@ -116,7 +125,12 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 
 	p.setLastPollTime()
 
-	return alerts, errors
+	return alerts, redditErrors
+}
+
+func (p *Poller) updateSubscriptions() {
+	// TODO: retrieve subscription changes from bot cache, set them, clean up
+	p.Bot.Database.GetSubscriptions()
 }
 
 // setLastPollTime sets the last time the poller ran. Posts retrieved by

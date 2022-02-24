@@ -12,12 +12,18 @@ import (
 
 	"github.com/snoonetIRC/subgrok/internal/pkg/alert"
 	"github.com/snoonetIRC/subgrok/internal/pkg/config"
+	"github.com/snoonetIRC/subgrok/internal/pkg/store"
 )
 
 // Bot is a SubGrok instance
 type Bot struct {
 	Config     *config.Config
 	Connection *irc.Connection
+	Database   *store.FileDB
+
+	// Permissions contain users who are an operator for the channels the bot is
+	// in ("##mike"["Mike"]true)
+	Permissions map[string]map[string]bool
 }
 
 // Load configures the IRC bot when it is first launched
@@ -27,6 +33,7 @@ func Load(config *config.Config) *Bot {
 	applyConfigToConnection(connection, config)
 
 	bot := &Bot{Connection: connection, Config: config}
+	bot.Permissions = make(map[string]map[string]bool)
 
 	for name, fn := range events(bot) {
 		bot.Connection.AddCallback(name, fn)

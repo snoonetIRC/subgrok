@@ -16,56 +16,56 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "one channel, one subreddit",
 			want: &Subscriptions{
-				ChannelToSubreddits: map[string][]string{
-					"##channel": {"first"},
+				ChannelToSubreddits: map[string]map[string]bool{
+					"##channel": {"first": true},
 				},
-				SubredditToChannels: map[string][]string{
-					"first": {"##channel"},
+				SubredditToChannels: map[string]map[string]bool{
+					"first": {"##channel": true},
 				},
 				Subreddits: []string{"first"},
 			},
 			subscriptions: &Subscriptions{
-				ChannelToSubreddits: map[string][]string{
-					"##channel": {"first"},
+				ChannelToSubreddits: map[string]map[string]bool{
+					"##channel": {"first": true},
 				},
 			},
 		},
 		{
 			name: "one channel, two subreddits",
 			want: &Subscriptions{
-				ChannelToSubreddits: map[string][]string{
-					"##channel": {"first", "second"},
+				ChannelToSubreddits: map[string]map[string]bool{
+					"##channel": {"first": true, "second": true},
 				},
-				SubredditToChannels: map[string][]string{
-					"first":  {"##channel"},
-					"second": {"##channel"},
+				SubredditToChannels: map[string]map[string]bool{
+					"first":  {"##channel": true},
+					"second": {"##channel": true},
 				},
 				Subreddits: []string{"first", "second"},
 			},
 			subscriptions: &Subscriptions{
-				ChannelToSubreddits: map[string][]string{
-					"##channel": {"first", "second"},
+				ChannelToSubreddits: map[string]map[string]bool{
+					"##channel": {"first": true, "second": true},
 				},
 			},
 		},
 		{
 			name: "many channels, many subreddits",
 			want: &Subscriptions{
-				ChannelToSubreddits: map[string][]string{
-					"##channel": {"first", "second"},
-					"##other":   {"second", "third"},
+				ChannelToSubreddits: map[string]map[string]bool{
+					"##channel": {"first": true, "second": true},
+					"##other":   {"second": true, "third": true},
 				},
-				SubredditToChannels: map[string][]string{
-					"first":  {"##channel"},
-					"second": {"##channel", "##other"},
-					"third":  {"##other"},
+				SubredditToChannels: map[string]map[string]bool{
+					"first":  {"##channel": true},
+					"second": {"##channel": true, "##other": true},
+					"third":  {"##other": true},
 				},
 				Subreddits: []string{"first", "second", "third"},
 			},
 			subscriptions: &Subscriptions{
-				ChannelToSubreddits: map[string][]string{
-					"##channel": {"first", "second"},
-					"##other":   {"second", "third"},
+				ChannelToSubreddits: map[string]map[string]bool{
+					"##channel": {"first": true, "second": true},
+					"##other":   {"second": true, "third": true},
 				},
 			},
 		},
