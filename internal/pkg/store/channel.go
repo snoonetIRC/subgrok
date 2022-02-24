@@ -77,8 +77,13 @@ func (f *FileDB) GetChannels() ([]string, error) {
 
 	var channels []string
 
-	for channel := range(subscriptions) {
-		channels = append(channels, channel)
+	for channel, subreddits := range subscriptions {
+		for _, subscribed := range subreddits {
+			if subscribed {
+				channels = append(channels, channel)
+				break
+			}
+		}
 	}
 
 	return channels, nil
