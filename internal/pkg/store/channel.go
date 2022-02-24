@@ -6,7 +6,7 @@ import "github.com/davecgh/go-spew/spew"
 const ChannelBucketKey = "channel"
 
 func (f *FileDB) ToggleSubscription(channel string, subreddit string, subscribed bool) error {
-	return f.DB.Update(func (tx *bolt.Tx) error {
+	return f.DB.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(ChannelBucketKey))
 
 		if bucket == nil {
@@ -49,7 +49,7 @@ func (f *FileDB) GetSubscriptions() (map[string]map[string]bool, error) {
 				return nil
 			}
 
-			return channelBucket.ForEach(func (k, v []byte) error {
+			return channelBucket.ForEach(func(k, v []byte) error {
 				subreddit := string(k)
 				subscriptionString := string(v)
 

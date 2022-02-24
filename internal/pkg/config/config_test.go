@@ -182,10 +182,10 @@ func TestLoad(t *testing.T) {
 			processorMock: &processorMockErrorRaised{}, // from file_processor_test.go
 		},
 		{
-			name: "Missing database filepath",
-			want: &Config{},
-			wantErr: true,
-			wantErrMsg: "A database filepath is required (config database.filepath)",
+			name:          "Missing database filepath",
+			want:          &Config{},
+			wantErr:       true,
+			wantErrMsg:    "A database filepath is required (config database.filepath)",
 			processorMock: &processorMockInvalidDatabaseFilepath{},
 		},
 		{

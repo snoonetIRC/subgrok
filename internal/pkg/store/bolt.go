@@ -19,7 +19,7 @@ func NewStore(db *bolt.DB) (*FileDB, error) {
 }
 
 func (f *FileDB) init() error {
-	return f.DB.Update(func (tx *bolt.Tx) error {
+	return f.DB.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(ChannelBucketKey))
 
 		if err != nil {

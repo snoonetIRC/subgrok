@@ -71,7 +71,7 @@ func (p *Poller) Poll() {
 			p.updateSubscriptions()
 
 			for _, alert := range alerts {
-				for channel, _ := range alert.Channels {
+				for channel := range alert.Channels {
 					p.Bot.AlertChannel(channel, alert)
 				}
 			}
@@ -96,7 +96,7 @@ func (p *Poller) Poll() {
 func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 	var (
 		redditErrors []error
-		alerts []*alert.Alert
+		alerts       []*alert.Alert
 	)
 
 	posts, _, err := p.API.Subreddit.NewPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
