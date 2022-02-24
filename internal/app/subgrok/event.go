@@ -9,8 +9,6 @@ import (
 	"github.com/snoonetIRC/subgrok/internal/pkg/command"
 )
 
-//import "github.com/davecgh/go-spew/spew"
-
 const (
 	commandSubscribe   = "subscribe"
 	commandUnsubscribe = "unsubscribe"

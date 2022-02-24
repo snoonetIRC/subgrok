@@ -1,8 +1,5 @@
 package store
 
-import bolt "go.etcd.io/bbolt"
-import "github.com/davecgh/go-spew/spew"
-
 const ChannelBucketKey = "channel"
 
 func (f *FileDB) ToggleSubscription(channel string, subreddit string, subscribed bool) error {
@@ -65,8 +62,6 @@ func (f *FileDB) GetSubscriptions() (map[string]map[string]bool, error) {
 			})
 		})
 	})
-
-	spew.Dump(subscriptions)
 
 	return subscriptions, err
 }
