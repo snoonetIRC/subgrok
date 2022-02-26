@@ -19,8 +19,8 @@ the provided subreddit.
 Permitted to channel half-operators and above only.
 
 ```
-<@Mike>    !subscribe /r/metal
-< subgrok> Subscribed #metal to metal
+<@Mike>    !subscribe /r/Metal
+< subgrok> Subscribed #metal to Metal
 ```
 
 ### `!subscriptions`
@@ -31,7 +31,7 @@ Permitted to channel half-operators and above only.
 
 ```
 <@Mike> !subscriptions
-< subgrok> #metal subscribes to: metal
+< subgrok> #metal subscribes to: Metal
 ```
 
 ### `!unsubscribe <subreddit name here>`
@@ -44,8 +44,8 @@ subreddit.
 Permitted to channel half-operators and above only.
 
 ```
-<@Mike>    !unsubscribe /r/metal
-< subgrok> Unsubscribed #metal from metal
+<@Mike>    !unsubscribe /r/Metal
+< subgrok> Unsubscribed #metal from Metal
 ```
 
 ## Hosting your own
