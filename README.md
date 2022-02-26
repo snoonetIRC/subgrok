@@ -14,6 +14,8 @@ The bot has three commands:
 Subscribes the current channel to receive messages when a new post is made on
 the provided subreddit.
 
+**Please note that subreddit names are case-sensitive.**
+
 Permitted to channel half-operators and above only.
 
 ```
@@ -24,8 +26,6 @@ Permitted to channel half-operators and above only.
 ### `!subscriptions`
 
 Lists the subreddits the current channel is subscribed to.
-
-Please note that this command is case-sensitive.
 
 Permitted to channel half-operators and above only.
 
@@ -39,7 +39,7 @@ Permitted to channel half-operators and above only.
 Unsubscribes the current channel from messages about new posts on the provided
 subreddit.
 
-Please note that this command is case-sensitive.
+**Please note that subreddit names are case-sensitive.**
 
 Permitted to channel half-operators and above only.
 
