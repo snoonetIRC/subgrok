@@ -1,4 +1,4 @@
-# subgrok
+# subgrok [![Go Report Card](https://goreportcard.com/badge/github.com/snoonetIRC/subgrok)](https://goreportcard.com/report/github.com/snoonetIRC/subgrok)
 
 `subgrok` is an IRC bot which alerts IRC channels when new posts are made to
 subreddits.
