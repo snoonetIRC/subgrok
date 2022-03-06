@@ -58,6 +58,10 @@ assumes you would like to host the bot on a 64 bit Linux server.
 
 ### Configuration reference
 
+Please be aware that the recommended value for `reddit.poll_wait_time` is
+"600". A smaller value may result in your IP address being blocked from
+Reddit's API.
+
 ```yaml
 ---
 # "irc" is configuration used for the IRC connection
