@@ -56,11 +56,24 @@ the application's most recent releases.
 Linux x86_64 binaries are automatically attached to every build. This guide
 assumes you would like to host the bot on a 64 bit Linux server.
 
-### Configuration reference
+### reddit authentication
 
-Please be aware that the recommended value for `reddit.poll_wait_time` is
-"600". A smaller value may result in your IP address being blocked from
-Reddit's API.
+You will need to register an app on reddit in order to get credentials for
+their API. See the information [here](https://github.com/reddit-archive/reddit/wiki/OAuth2-Quick-Start-Example#first-steps).
+You will need:
+
+| Credential          | Config element in Subgrok's YAML | Description                            |
+| :------------------ | :------------------------------- | :------------------------------------- |
+| Username            | `reddit.username`                | Your reddit account's username         |
+| Password            | `reddit.password`                | Your reddit account's password         |
+| Client ID           | `reddit.id`                      | Your application's client ID           |
+| Secret access token | `reddit.secret`                  | Your application's secret access token |
+
+It is recommended that you create a separate reddit account with no two-factor
+authentication in order to use the bot (2FA seems to break the reddit API
+client).
+
+### Configuration reference
 
 ```yaml
 ---
@@ -83,7 +96,8 @@ irc:
 
 # "reddit" is configuration for our use of the reddit API
 reddit:
-  poll_wait_time: 600 # Time to wait (seconds) between reddit API calls
+  poll_wait_duration: 10m # Time to wait between reddit API calls
+  minimum_post_age: 2m # How old the post must be to be displayed
 
 # "database" is configuration for the database
 database:
@@ -117,7 +131,7 @@ commands:
 
 ### Building
 
-If you would like to build the application yourself, you will need Golang 1.17+.
+If you would like to build the application yourself, you will need Golang 1.18+.
 
 ```
 % go build -o subgrok ./cmd/subgrok/main.go

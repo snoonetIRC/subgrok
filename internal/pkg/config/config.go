@@ -50,13 +50,13 @@ type ircConfig struct {
 
 // redditConfig contains the bot's reddit authentication configuration.
 type redditConfig struct {
-	ID           string `yaml:"id"`
-	Secret       string `yaml:"secret"`
-	Username     string `yaml:"username"`
-	Password     string `yaml:"password"`
-	PollWaitTime int    `yaml:"poll_wait_time"`
+	ID       string `yaml:"id"`
+	Password string `yaml:"password"`
+	Secret   string `yaml:"secret"`
+	Username string `yaml:"username"`
 
-	PollWaitDuration time.Duration
+	PollWaitDuration time.Duration `yaml:"poll_wait_duration"`
+	MinimumPostAge   time.Duration `yaml:"minimum_post_age"`
 }
 
 type applicationConfig struct {
@@ -99,20 +99,19 @@ func Load() (*Config, error) {
 }
 
 func (c *Config) applyDefaults() {
-	if c.Reddit == nil {
-		c.Reddit = &redditConfig{}
+	if c.Application == nil {
+		c.Application = &applicationConfig{}
 	}
-
-	c.Reddit.applyDefaults()
 
 	if c.IRC == nil {
 		c.IRC = &ircConfig{}
 	}
 
-	if c.Application == nil {
-		c.Application = &applicationConfig{}
+	if c.Reddit == nil {
+		c.Reddit = &redditConfig{}
 	}
 
+	c.Reddit.applyDefaults()
 	c.Application.applyDefaults()
 
 	if c.IRC.CommandPrefix == "" {
@@ -125,11 +124,11 @@ func (ic *ircConfig) Hostname() string {
 }
 
 func (rc *redditConfig) applyDefaults() {
-	if rc.PollWaitTime < defaultRedditPollWaitTime {
-		rc.PollWaitTime = defaultRedditPollWaitTime
-	}
+	defaultPollWaitTime := time.Duration(defaultRedditPollWaitTime * time.Second)
 
-	rc.PollWaitDuration = time.Duration(rc.PollWaitTime) * time.Second
+	if rc.PollWaitDuration <= defaultPollWaitTime {
+		rc.PollWaitDuration = time.Duration(defaultPollWaitTime)
+	}
 }
 
 func (rc *redditConfig) Credentials() *reddit.Credentials {
