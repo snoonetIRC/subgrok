@@ -39,9 +39,8 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 		Config: config,
 
 		Subscriptions: &subscription.Subscriptions{},
+		TooRecent:     make(map[string]bool),
 	}
-
-	poller.TooRecent = make(map[string]bool)
 
 	poller.Subscriptions.ReloadFromDatabase(bot.Database)
 
@@ -105,7 +104,7 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 
 	if err != nil {
 		redditErrors = append(redditErrors, err)
-	} else {
+	} else if p.Config.IRC.Debug {
 		p.Bot.Connection.Log.Printf("API requests: used %d, remaining %d (resets %s)",
 			client.Rate.Used, client.Rate.Remaining, client.Rate.Reset.String())
 	}
@@ -153,9 +152,7 @@ func (p *Poller) setLastPollTime() {
 }
 
 func (p *Poller) postIsOldEnough(post *reddit.Post) bool {
-	var minimumPostAgeSeconds = p.Config.Reddit.MinimumPostAge
-
-	if minimumPostAgeSeconds == 0 {
+	if p.Config.Reddit.MinimumPostAge == 0 {
 		return true
 	}
 
