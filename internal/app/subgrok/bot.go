@@ -61,8 +61,6 @@ func (b *Bot) Connect() {
 		panic(err)
 	}
 
-	// TODO: start healthcheck
-
 	b.Connection.Loop()
 }
 
