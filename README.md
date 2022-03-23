@@ -97,7 +97,12 @@ irc:
 # "reddit" is configuration for our use of the reddit API
 reddit:
   poll_wait_duration: 10m # Time to wait between reddit API calls
-  minimum_post_age: 2m # How old the post must be to be displayed
+  minimum_post_age: 2m    # How old the post must be to be displayed
+
+  username: myuser      # Your bot's reddit username
+  password: mypassword  # Your bot's reddit password
+  id: myid              # Your bot's application ID
+  secret: mysecret      # Your bot's application secret
 
 # "database" is configuration for the database
 database:
