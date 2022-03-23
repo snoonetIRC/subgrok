@@ -22,12 +22,12 @@ type Poller struct {
 	Config        *config.Config
 	Subscriptions *subscription.Subscriptions
 	LastPoll      *time.Time
+	TooRecent     map[string]bool
 }
 
 // Load builds a new Poller
 func Load(config *config.Config, bot *subgrok.Bot) *Poller {
-	//client, err := reddit.NewClient(*config.Reddit.Credentials())
-	client, err := reddit.NewReadonlyClient()
+	client, err := reddit.NewClient(*config.Reddit.Credentials())
 
 	if err != nil {
 		panic(err)
@@ -39,6 +39,7 @@ func Load(config *config.Config, bot *subgrok.Bot) *Poller {
 		Config: config,
 
 		Subscriptions: &subscription.Subscriptions{},
+		TooRecent:     make(map[string]bool),
 	}
 
 	poller.Subscriptions.ReloadFromDatabase(bot.Database)
@@ -75,7 +76,12 @@ func (p *Poller) Poll() {
 				var errorStrings []string
 
 				for _, err := range errs {
-					errorStrings = append(errorStrings, err.Error())
+					// Strip console-spamming "badger badger badger" message from
+					// reddit's rate-limiting error page
+					e := err.Error()
+					e = strings.ReplaceAll(e, "badger ", "")
+
+					errorStrings = append(errorStrings, e)
 				}
 
 				p.Bot.Connection.Log.Printf("Received errors from reddit: %s", strings.Join(errorStrings, ", "))
@@ -92,17 +98,30 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 		alerts       []*alert.Alert
 	)
 
-	posts, _, err := p.API.Subreddit.NewPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
-		Limit: 5 * len(p.Subscriptions.Subreddits),
+	posts, client, err := p.API.Subreddit.NewPosts(context.Background(), p.Subscriptions.ToSubredditString(), &reddit.ListOptions{
+		Limit: 10 * len(p.Subscriptions.Subreddits),
 	})
 
 	if err != nil {
 		redditErrors = append(redditErrors, err)
+	} else if p.Config.IRC.Debug {
+		p.Bot.Connection.Log.Printf("API requests: used %d, remaining %d (resets %s)",
+			client.Rate.Used, client.Rate.Remaining, client.Rate.Reset.String())
 	}
 
+	tooRecent := make(map[string]bool)
+
 	for _, post := range posts {
-		if p.LastPoll == nil || !post.Created.After(*p.LastPoll) {
-			continue // Skip posts which were created before the last poll time
+		// Skip posts which were created before the last poll time unless they
+		// were deemed to be too new to display
+		if p.LastPoll == nil || (!p.TooRecent[post.ID] && !post.Created.After(*p.LastPoll)) {
+			continue
+		}
+
+		if !p.postIsOldEnough(post) {
+			tooRecent[post.ID] = true
+
+			continue // Skip posts that aren't yet old enough
 		}
 
 		if err != nil {
@@ -116,6 +135,10 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 		})
 	}
 
+	// Clean up post delay cache - some of the old items could be removed by
+	// moderators and end up staying in there forever
+	p.TooRecent = tooRecent
+
 	p.setLastPollTime()
 
 	return alerts, redditErrors
@@ -126,4 +149,19 @@ func (p *Poller) checkSubscriptions() ([]*alert.Alert, []error) {
 func (p *Poller) setLastPollTime() {
 	lastPoll := time.Now().UTC()
 	p.LastPoll = &lastPoll
+}
+
+func (p *Poller) postIsOldEnough(post *reddit.Post) bool {
+	if p.Config.Reddit.MinimumPostAge == 0 {
+		return true
+	}
+
+	oldEnough := time.Since(post.Created.Time) > p.Config.Reddit.MinimumPostAge
+
+	if !oldEnough && p.Config.IRC.Debug {
+		p.Bot.Connection.Log.Printf("Post isn't old enough: %s (%s) (Minimum %.4f seconds)\n",
+			post.Title, post.Created.String(), p.Config.Reddit.MinimumPostAge.Seconds())
+	}
+
+	return oldEnough
 }

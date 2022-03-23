@@ -34,7 +34,7 @@ reddit:
   secret: secret
   username: username
   password: password
-  poll_wait_time: 60
+  poll_wait_duration: 60s
 `
 
 const exampleBadConfig = `
@@ -69,7 +69,7 @@ reddit:
   secret: secret
   username: username
   password: password
-  poll_wait_time: 59
+  poll_wait_duration: 59s
 `
 
 var exampleValidConfig = &Config{
@@ -93,7 +93,6 @@ var exampleValidConfig = &Config{
 		Secret:           "secret",
 		Username:         "username",
 		Password:         "password",
-		PollWaitTime:     60,
 		PollWaitDuration: time.Duration(60 * time.Second),
 	},
 	Application: &applicationConfig{ChannelMaximumSubscriptions: defaultChannelMaximumSubscriptions},
@@ -190,7 +189,7 @@ func TestLoad(t *testing.T) {
 			processorMock: &processorMockInvalidDatabaseFilepath{},
 		},
 		{
-			name:          "reddit PollWaitTime below minimum",
+			name:          "reddit PollWaitDuration below minimum",
 			want:          exampleValidConfig,
 			processorMock: &processorMockInvalidRedditWaitTime{},
 		},
