@@ -30,7 +30,7 @@ Lists the subreddits the current channel is subscribed to.
 Permitted to channel half-operators and above only.
 
 ```
-<@Mike> !subscriptions
+<@Mike>    !subscriptions
 < subgrok> #metal subscribes to: Metal
 ```
 
