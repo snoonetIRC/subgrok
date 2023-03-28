@@ -3,7 +3,7 @@ module github.com/snoonetIRC/subgrok
 go 1.20
 
 require (
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/n7st/go-ircformat v1.0.0
 	github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0
 	github.com/stretchr/testify v1.8.1
