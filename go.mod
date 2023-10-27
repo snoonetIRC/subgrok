@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/vartanbeno/go-reddit/v2 v2.0.1
-	go.etcd.io/bbolt v1.3.7
+	go.etcd.io/bbolt v1.3.8
 	gopkg.in/yaml.v2 v2.4.0
 )
 
