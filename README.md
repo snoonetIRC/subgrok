@@ -136,7 +136,7 @@ commands:
 
 ### Building
 
-If you would like to build the application yourself, you will need Golang 1.18+.
+If you would like to build the application yourself, you will need Golang 1.21+.
 
 ```
 % go build -o subgrok ./cmd/subgrok/main.go
