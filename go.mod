@@ -1,6 +1,7 @@
 module github.com/snoonetIRC/subgrok
 
 go 1.21
+toolchain go1.22.5
 
 require (
 	github.com/google/go-cmp v0.6.0
@@ -9,7 +10,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/thoj/go-ircevent v0.0.0-20210723090443-73e444401d64
 	github.com/vartanbeno/go-reddit/v2 v2.0.1
-	go.etcd.io/bbolt v1.3.10
+	go.etcd.io/bbolt v1.3.11
 	gopkg.in/yaml.v2 v2.4.0
 )
 
