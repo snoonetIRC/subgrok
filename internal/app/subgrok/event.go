@@ -47,7 +47,7 @@ func (b *Bot) callback001(e *irc.Event) {
 	if err == nil {
 		b.joinChannels(channels)
 	} else {
-		b.Connection.Log.Printf("Error retrieving stored channels: " + err.Error())
+		b.Connection.Log.Printf("Error retrieving stored channels: %s", err.Error())
 	}
 }
 
@@ -125,7 +125,7 @@ func (b *Bot) callbackPrivmsg(e *irc.Event) {
 	}
 
 	if response != "" {
-		b.Connection.Privmsgf(e.Arguments[0], response)
+		b.Connection.Privmsg(e.Arguments[0], response)
 	}
 }
 
